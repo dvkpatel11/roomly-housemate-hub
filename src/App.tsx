@@ -14,6 +14,7 @@ import Landing from "./pages/Landing";
 import Tasks from "./pages/Tasks";
 import Expenses from "./pages/Expenses";
 import Events from "./pages/Events";
+import Communication from "./pages/Communication";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import Login from "./pages/auth/Login";
@@ -48,6 +49,7 @@ const App = () => (
                     <Route path="calendar" element={<Events />} />
                     <Route path="expenses" element={<Expenses />} />
                     <Route path="tasks" element={<Tasks />} />
+                    <Route path="communication" element={<Communication />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="settings" element={<Settings />} />
                   </Route>
