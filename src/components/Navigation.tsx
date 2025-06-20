@@ -27,6 +27,8 @@ const Navigation: React.FC = () => {
   const { isCollapsed, toggleSidebar, isMobileOpen, setIsMobileOpen } = useSidebar();
   const isMobile = useIsMobile();
 
+  console.log('Navigation render:', { isMobile, isCollapsed, isMobileOpen });
+
   useEffect(() => {
     setActiveTab(location.pathname);
   }, [location.pathname, setActiveTab]);
@@ -136,8 +138,8 @@ const Navigation: React.FC = () => {
   if (isMobile) {
     return (
       <>
-        {/* Mobile Bottom Navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t">
+        {/* Mobile Bottom Navigation - Fixed z-index to be below header */}
+        <nav className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-t">
           <div className="flex items-center justify-around px-1 py-1 safe-area-pb">
             {mainNavigationItems.map((item) => (
               <TabItem key={item.to} {...item} />
@@ -153,9 +155,9 @@ const Navigation: React.FC = () => {
           />
         )}
 
-        {/* Mobile Sidebar */}
+        {/* Mobile Sidebar - Higher z-index than overlay but lower than header */}
         <aside className={cn(
-          'fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-64 bg-background border-r z-50 transform transition-transform duration-300 ease-in-out lg:hidden',
+          'fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-64 bg-background border-r z-45 transform transition-transform duration-300 ease-in-out lg:hidden',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}>
           <div className="flex flex-col h-full">
@@ -193,7 +195,7 @@ const Navigation: React.FC = () => {
   return (
     <>
       <aside className={cn(
-        'fixed left-0 top-14 h-[calc(100vh-3.5rem)] flex flex-col border-r bg-background z-40 transition-all duration-300 ease-in-out',
+        'fixed left-0 top-14 h-[calc(100vh-3.5rem)] flex flex-col border-r bg-background z-30 transition-all duration-300 ease-in-out',
         isCollapsed ? 'w-16' : 'w-64'
       )}>
         {/* Navigation Items */}
@@ -210,9 +212,9 @@ const Navigation: React.FC = () => {
         </nav>
       </aside>
 
-      {/* Toggle Notch - Outside sidebar, positioned relative to first option */}
+      {/* Toggle Notch - Outside sidebar, positioned relative to first option with proper z-index */}
       <div className={cn(
-        'fixed top-[calc(3.5rem+2rem+0.75rem)] z-50 transition-all duration-300 ease-in-out',
+        'fixed top-[calc(3.5rem+2rem+0.75rem)] z-35 transition-all duration-300 ease-in-out',
         isCollapsed ? 'left-16' : 'left-64'
       )}>
         <button

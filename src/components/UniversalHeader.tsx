@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Moon, Sun, User, ChevronDown, Home, Settings, LogOut } from 'lucide-react';
+import { Bell, Moon, Sun, User, ChevronDown, Home, Settings, LogOut, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -16,6 +16,8 @@ import { Badge } from '@/components/ui/badge';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigation } from '@/context/NavigationContext';
+import { useSidebar } from '@/context/SidebarContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface UniversalHeaderProps {
   variant?: 'protected' | 'public';
@@ -25,6 +27,8 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
   const { theme, setTheme, isDark } = useTheme();
   const { user, isAuthenticated, logout, isLoading } = useAuth();
   const { notifications } = useNavigation();
+  const { setIsMobileOpen } = useSidebar();
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
 
   const toggleTheme = () => {
@@ -44,38 +48,62 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
     navigate('/auth/signup');
   };
 
+  const handleMobileMenuToggle = () => {
+    if (isMobile && isAuthenticated) {
+      setIsMobileOpen(true);
+    }
+  };
+
   // For protected variant, only show protected content if user is authenticated
   const showProtectedContent = variant === 'protected' && isAuthenticated;
   // For public variant, always show public content
   const showPublicContent = variant === 'public';
 
+  console.log('UniversalHeader render:', { variant, isAuthenticated, user, showProtectedContent });
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4 lg:px-6">
-        {/* Logo Section */}
-        <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-          <div className="relative">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-roomly-primary to-roomly-secondary flex items-center justify-center shadow-lg">
-              <Home className="h-5 w-5 text-white" />
+        {/* Left Section - Logo + Mobile Menu */}
+        <div className="flex items-center space-x-3">
+          {/* Mobile Menu Button - Only show when authenticated and on mobile */}
+          {showProtectedContent && isMobile && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleMobileMenuToggle}
+              className="h-10 w-10 px-0 hover:bg-accent/50 transition-colors"
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
+
+          {/* Logo Section */}
+          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <div className="relative">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-roomly-primary to-roomly-secondary flex items-center justify-center shadow-lg">
+                <Home className="h-5 w-5 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 h-4 w-4 bg-roomly-accent rounded-full opacity-80"></div>
             </div>
-            <div className="absolute -top-1 -right-1 h-4 w-4 bg-roomly-accent rounded-full opacity-80"></div>
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-roomly-primary to-roomly-secondary bg-clip-text text-transparent leading-tight">
-              Roomly
-            </h1>
-            {showPublicContent && (
-              <span className="text-xs text-muted-foreground leading-none hidden sm:block">
-                Your Home, Organized
-              </span>
-            )}
-            {showProtectedContent && user?.householdId && (
-              <span className="text-xs text-muted-foreground leading-none hidden sm:block">
-                Household
-              </span>
-            )}
-          </div>
-        </Link>
+            <div className="flex flex-col">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-roomly-primary to-roomly-secondary bg-clip-text text-transparent leading-tight">
+                Roomly
+              </h1>
+              {showPublicContent && (
+                <span className="text-xs text-muted-foreground leading-none hidden sm:block">
+                  Your Home, Organized
+                </span>
+              )}
+              {showProtectedContent && user?.householdId && (
+                <span className="text-xs text-muted-foreground leading-none hidden sm:block">
+                  Household
+                </span>
+              )}
+            </div>
+          </Link>
+        </div>
 
         {/* Right Section */}
         <div className="flex items-center space-x-2">

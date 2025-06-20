@@ -11,11 +11,15 @@ import { useAuth } from '@/context/AuthContext';
 const Layout: React.FC = () => {
   const isMobile = useIsMobile();
   const { isCollapsed } = useSidebar();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  console.log('Layout render:', { isAuthenticated, isLoading, isMobile });
 
   return (
     <div className="min-h-screen bg-background">
       <UniversalHeader variant={isAuthenticated ? 'protected' : 'public'} />
+      
+      {/* Always render Navigation when authenticated, regardless of loading state */}
       {isAuthenticated && <Navigation />}
       
       <main className={cn(
