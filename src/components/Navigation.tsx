@@ -1,7 +1,8 @@
 
+
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Calendar, DollarSign, CheckSquare, User, Settings, X } from 'lucide-react';
+import { Home, Calendar, DollarSign, CheckSquare, User, Settings, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigation } from '@/context/NavigationContext';
 import { useSidebar } from '@/context/SidebarContext';
@@ -194,25 +195,23 @@ const Navigation: React.FC = () => {
       'fixed left-0 top-14 h-[calc(100vh-3.5rem)] flex flex-col border-r bg-background z-40 transition-all duration-300 ease-in-out group',
       isCollapsed ? 'w-16' : 'w-64'
     )}>
-      {/* Visual Notch Indicator */}
-      <div className="relative">
-        {/* Clickable area for toggle */}
-        <button
-          onClick={toggleSidebar}
-          className="absolute right-0 top-4 h-8 w-3 bg-muted/50 hover:bg-muted rounded-l-lg transition-colors duration-200 border border-r-0 flex items-center justify-center group-hover:bg-muted cursor-pointer"
-          aria-label="Toggle sidebar"
-        >
-          {/* Visual notch indicators */}
-          <div className="flex flex-col space-y-0.5">
-            <div className="w-0.5 h-1 bg-muted-foreground/40 rounded-full"></div>
-            <div className="w-0.5 h-1 bg-muted-foreground/40 rounded-full"></div>
-            <div className="w-0.5 h-1 bg-muted-foreground/40 rounded-full"></div>
-          </div>
-        </button>
-      </div>
-
       {/* Navigation Items */}
-      <nav className="flex-1 p-2 space-y-1 overflow-y-auto mt-2">
+      <nav className="flex-1 p-2 space-y-1 overflow-y-auto mt-2 relative">
+        {/* Toggle Notch - Positioned relative to first nav item */}
+        <div className="absolute -right-4 top-3 z-10">
+          <button
+            onClick={toggleSidebar}
+            className="h-8 w-8 bg-gradient-to-r from-roomly-primary to-roomly-secondary hover:from-roomly-primary/90 hover:to-roomly-secondary/90 rounded-r-lg border border-l-0 border-roomly-primary/20 flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg"
+            aria-label="Toggle sidebar"
+          >
+            {isCollapsed ? (
+              <ChevronRight className="h-4 w-4 text-white" />
+            ) : (
+              <ChevronLeft className="h-4 w-4 text-white" />
+            )}
+          </button>
+        </div>
+
         {mainNavigationItems.map((item) => (
           <SidebarItem key={item.to} {...item} collapsed={isCollapsed} />
         ))}
@@ -228,3 +227,4 @@ const Navigation: React.FC = () => {
 };
 
 export default Navigation;
+
