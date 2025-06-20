@@ -27,9 +27,6 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
   const { notifications } = useNavigation();
   const navigate = useNavigate();
 
-  // Show protected content only when variant is protected AND user is authenticated
-  const showProtectedContent = variant === 'protected' && isAuthenticated;
-
   const toggleTheme = () => {
     setTheme(isDark ? 'light' : 'dark');
   };
@@ -47,6 +44,11 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
     navigate('/auth/signup');
   };
 
+  // For protected variant, only show protected content if user is authenticated
+  const showProtectedContent = variant === 'protected' && isAuthenticated;
+  // For public variant, always show public content
+  const showPublicContent = variant === 'public';
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4 lg:px-6">
@@ -62,31 +64,38 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
             <h1 className="text-xl font-bold bg-gradient-to-r from-roomly-primary to-roomly-secondary bg-clip-text text-transparent leading-tight">
               Roomly
             </h1>
-            <span className="text-xs text-muted-foreground leading-none hidden sm:block">
-              Your Home, Organized
-            </span>
+            {showPublicContent && (
+              <span className="text-xs text-muted-foreground leading-none hidden sm:block">
+                Your Home, Organized
+              </span>
+            )}
+            {showProtectedContent && user?.household && (
+              <span className="text-xs text-muted-foreground leading-none hidden sm:block">
+                {user.household.name}
+              </span>
+            )}
           </div>
         </Link>
 
         {/* Right Section */}
         <div className="flex items-center space-x-2">
-          {/* Theme Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleTheme}
-            className="h-10 w-10 px-0 hover:bg-accent/50 transition-colors"
-            aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-          >
-            {isDark ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
-          </Button>
-
           {showProtectedContent ? (
             <>
+              {/* Theme Toggle */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTheme}
+                className="h-10 w-10 px-0 hover:bg-accent/50 transition-colors"
+                aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+              >
+                {isDark ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </Button>
+
               {/* Notifications */}
               <Button 
                 variant="ghost" 
@@ -155,6 +164,21 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
             </>
           ) : (
             <>
+              {/* Theme Toggle (always available) */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTheme}
+                className="h-10 w-10 px-0 hover:bg-accent/50 transition-colors"
+                aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+              >
+                {isDark ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </Button>
+
               {/* Public Route Buttons */}
               <div className="flex items-center space-x-2">
                 <Button

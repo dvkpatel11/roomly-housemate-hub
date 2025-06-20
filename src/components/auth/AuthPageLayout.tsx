@@ -1,5 +1,6 @@
 
 import React from 'react';
+import UniversalHeader from '../UniversalHeader';
 
 interface AuthPageLayoutProps {
   children: React.ReactNode;
@@ -8,6 +9,7 @@ interface AuthPageLayoutProps {
 const AuthPageLayout: React.FC<AuthPageLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-background">
+      <UniversalHeader variant="public" />
       {children}
     </div>
   );
