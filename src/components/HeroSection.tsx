@@ -1,10 +1,14 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckSquare, DollarSign, Calendar, Users } from 'lucide-react';
+import { CheckSquare, DollarSign, Calendar, Users, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection: React.FC = () => {
+  const navigate = useNavigate();
+
   const features = [
     {
       icon: CheckSquare,
@@ -45,10 +49,19 @@ const HeroSection: React.FC = () => {
               The ultimate household management app that brings roommates together
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-gradient-to-r from-roomly-primary to-roomly-secondary hover:opacity-90 transition-opacity">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-roomly-primary to-roomly-secondary hover:opacity-90 transition-opacity"
+                onClick={() => navigate('/auth/signup')}
+              >
                 Get Started
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <Button variant="outline" size="lg">
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => navigate('/landing')}
+              >
                 Learn More
               </Button>
             </div>
@@ -88,7 +101,11 @@ const HeroSection: React.FC = () => {
           <p className="text-lg text-muted-foreground mb-8">
             Join thousands of happy roommates who've discovered the joy of organized living
           </p>
-          <Button size="lg" className="bg-gradient-to-r from-roomly-primary to-roomly-secondary hover:opacity-90 transition-opacity">
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-roomly-primary to-roomly-secondary hover:opacity-90 transition-opacity"
+            onClick={() => navigate('/auth/signup')}
+          >
             Start Your Journey
           </Button>
         </div>
