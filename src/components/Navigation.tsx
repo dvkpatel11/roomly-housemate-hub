@@ -1,5 +1,4 @@
 
-
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Calendar, DollarSign, CheckSquare, User, Settings, X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -191,40 +190,44 @@ const Navigation: React.FC = () => {
   }
 
   return (
-    <aside className={cn(
-      'fixed left-0 top-14 h-[calc(100vh-3.5rem)] flex flex-col border-r bg-background z-40 transition-all duration-300 ease-in-out group',
-      isCollapsed ? 'w-16' : 'w-64'
-    )}>
-      {/* Navigation Items */}
-      <nav className="flex-1 p-2 space-y-1 overflow-y-auto mt-2 relative">
-        {/* Toggle Notch - Positioned relative to first nav item */}
-        <div className="absolute -right-4 top-3 z-10">
-          <button
-            onClick={toggleSidebar}
-            className="h-8 w-8 bg-gradient-to-r from-roomly-primary to-roomly-secondary hover:from-roomly-primary/90 hover:to-roomly-secondary/90 rounded-r-lg border border-l-0 border-roomly-primary/20 flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg"
-            aria-label="Toggle sidebar"
-          >
-            {isCollapsed ? (
-              <ChevronRight className="h-4 w-4 text-white" />
-            ) : (
-              <ChevronLeft className="h-4 w-4 text-white" />
-            )}
-          </button>
-        </div>
+    <>
+      <aside className={cn(
+        'fixed left-0 top-14 h-[calc(100vh-3.5rem)] flex flex-col border-r bg-background z-40 transition-all duration-300 ease-in-out',
+        isCollapsed ? 'w-16' : 'w-64'
+      )}>
+        {/* Navigation Items */}
+        <nav className="flex-1 p-2 space-y-1 overflow-y-auto mt-2">
+          {mainNavigationItems.map((item) => (
+            <SidebarItem key={item.to} {...item} collapsed={isCollapsed} />
+          ))}
+          
+          <div className="my-4 border-t" />
+          
+          {drawerItems.map((item) => (
+            <SidebarItem key={item.to} {...item} collapsed={isCollapsed} />
+          ))}
+        </nav>
+      </aside>
 
-        {mainNavigationItems.map((item) => (
-          <SidebarItem key={item.to} {...item} collapsed={isCollapsed} />
-        ))}
-        
-        <div className="my-4 border-t" />
-        
-        {drawerItems.map((item) => (
-          <SidebarItem key={item.to} {...item} collapsed={isCollapsed} />
-        ))}
-      </nav>
-    </aside>
+      {/* Toggle Notch - Outside sidebar, positioned relative to first option */}
+      <div className={cn(
+        'fixed top-[calc(3.5rem+2rem+0.75rem)] z-50 transition-all duration-300 ease-in-out',
+        isCollapsed ? 'left-16' : 'left-64'
+      )}>
+        <button
+          onClick={toggleSidebar}
+          className="h-8 w-8 bg-gradient-to-r from-roomly-primary to-roomly-secondary hover:from-roomly-primary/90 hover:to-roomly-secondary/90 rounded-r-lg border border-l-0 border-roomly-primary/20 flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg"
+          aria-label="Toggle sidebar"
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4 text-white" />
+          ) : (
+            <ChevronLeft className="h-4 w-4 text-white" />
+          )}
+        </button>
+      </div>
+    </>
   );
 };
 
 export default Navigation;
-
