@@ -108,7 +108,7 @@ const Navigation: React.FC = () => {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-64 flex-col border-r bg-background p-4">
         <nav className="space-y-2">
-          {[...mainNavigationItems, ...drawerItems].map((item) => (
+          {mainNavigationItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -123,11 +123,28 @@ const Navigation: React.FC = () => {
             >
               <item.icon className="h-5 w-5" />
               <span className="font-medium">{item.label}</span>
-              {'badge' in item && item.badge > 0 && (
+              {item.badge > 0 && (
                 <span className="ml-auto bg-roomly-accent text-white text-xs px-2 py-1 rounded-full">
                   {item.badge > 9 ? '9+' : item.badge}
                 </span>
               )}
+            </NavLink>
+          ))}
+          {drawerItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={cn(
+                'flex items-center space-x-3 py-3 px-4 rounded-lg transition-all duration-200',
+                'hover:bg-muted/50',
+                (location.pathname === item.to || 
+                 (item.to === '/' && location.pathname === '/') ||
+                 (item.to !== '/' && location.pathname.startsWith(item.to))) && 
+                'bg-roomly-primary/10 text-roomly-primary'
+              )}
+            >
+              <item.icon className="h-5 w-5" />
+              <span className="font-medium">{item.label}</span>
             </NavLink>
           ))}
         </nav>
