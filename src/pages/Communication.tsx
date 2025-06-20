@@ -7,18 +7,24 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MessageCircle, Users, Bell, Phone, Video, Mail } from 'lucide-react';
 import { useAnnouncements, usePolls, useUnreadCount } from '@/hooks/useApi';
+import { Announcement, Poll } from '@/types/api';
 
 const Communication: React.FC = () => {
   const { data: announcements, isLoading: announcementsLoading } = useAnnouncements();
   const { data: polls, isLoading: pollsLoading } = usePolls();
   const { data: unreadCount } = useUnreadCount();
 
+  // Type the data properly
+  const announcementsData = announcements?.data as Announcement[] | undefined;
+  const pollsData = polls?.data as Poll[] | undefined;
+  const unreadCountData = unreadCount?.data as { count: number } | undefined;
+
   const communicationOptions = [
     { 
       icon: MessageCircle, 
       title: 'House Chat', 
       description: 'Group chat with all household members',
-      badge: unreadCount?.data?.count || 0,
+      badge: unreadCountData?.count || 0,
       action: () => console.log('Open house chat')
     },
     { 
@@ -32,7 +38,7 @@ const Communication: React.FC = () => {
       icon: Bell, 
       title: 'Announcements', 
       description: 'Important household announcements',
-      badge: announcements?.data?.filter(a => !a.read)?.length || 2,
+      badge: announcementsData?.filter(a => !a.pinned)?.length || 2,
       action: () => console.log('View announcements')
     },
     { 
@@ -53,15 +59,15 @@ const Communication: React.FC = () => {
       icon: Mail, 
       title: 'Polls & Voting', 
       description: 'Participate in household decisions',
-      badge: polls?.data?.filter(p => !p.closed)?.length || 1,
+      badge: pollsData?.filter(p => !p.closed)?.length || 1,
       action: () => console.log('View polls')
     },
   ];
 
   // Calculate stats from real data
-  const totalUnread = unreadCount?.data?.count || 8;
-  const activePolls = polls?.data?.filter(p => !p.closed)?.length || 1;
-  const pinnedAnnouncements = announcements?.data?.filter(a => a.pinned)?.length || 2;
+  const totalUnread = unreadCountData?.count || 8;
+  const activePolls = pollsData?.filter(p => !p.closed)?.length || 1;
+  const pinnedAnnouncements = announcementsData?.filter(a => a.pinned)?.length || 2;
 
   return (
     <div className="min-h-screen bg-background p-4 pb-20 lg:pb-4">
@@ -176,8 +182,8 @@ const Communication: React.FC = () => {
                     </CardContent>
                   </Card>
                 ))
-              ) : announcements?.data?.length > 0 ? (
-                announcements.data.slice(0, 3).map((announcement) => (
+              ) : announcementsData && announcementsData.length > 0 ? (
+                announcementsData.slice(0, 3).map((announcement) => (
                   <Card key={announcement.id} className="hover:shadow-md transition-shadow cursor-pointer">
                     <CardContent className="p-4">
                       <div className="flex items-start space-x-3">
