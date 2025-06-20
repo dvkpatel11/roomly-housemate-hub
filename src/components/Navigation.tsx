@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Calendar, CheckSquare, DollarSign, MessageCircle, User, Settings, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, Calendar, CheckSquare, DollarSign, MessageCircle, Settings, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigation } from '@/context/NavigationContext';
 import { useSidebar } from '@/context/SidebarContext';
@@ -9,16 +9,12 @@ import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const mainNavigationItems = [
-  { to: '/', icon: Home, label: 'Dashboard', badge: 0 },
-  { to: '/calendar', icon: Calendar, label: 'Calendar', badge: 2 },
-  { to: '/tasks', icon: CheckSquare, label: 'Tasks', badge: 5 },
-  { to: '/expenses', icon: DollarSign, label: 'Expenses', badge: 0 },
-  { to: '/communication', icon: MessageCircle, label: 'Communication', badge: 3 },
-  { to: '/profile', icon: User, label: 'More', badge: 0 },
-];
-
-const drawerItems = [
-  { to: '/settings', icon: Settings, label: 'Settings' },
+  { to: '/', icon: Home, label: 'Dashboard', badge: 0, color: 'text-blue-500' },
+  { to: '/calendar', icon: Calendar, label: 'Calendar', badge: 2, color: 'text-green-500' },
+  { to: '/tasks', icon: CheckSquare, label: 'Tasks', badge: 5, color: 'text-purple-500' },
+  { to: '/expenses', icon: DollarSign, label: 'Expenses', badge: 0, color: 'text-yellow-500' },
+  { to: '/communication', icon: MessageCircle, label: 'Communication', badge: 3, color: 'text-pink-500' },
+  { to: '/profile', icon: Settings, label: 'More', badge: 0, color: 'text-gray-500' },
 ];
 
 const Navigation: React.FC = () => {
@@ -45,7 +41,8 @@ const Navigation: React.FC = () => {
     icon: any; 
     label: string; 
     badge?: number;
-  }> = ({ to, icon: Icon, label, badge = 0 }) => {
+    color: string;
+  }> = ({ to, icon: Icon, label, badge = 0, color }) => {
     const isActive = location.pathname === to || 
       (to === '/' && location.pathname === '/') ||
       (to !== '/' && location.pathname.startsWith(to));
@@ -54,31 +51,25 @@ const Navigation: React.FC = () => {
       <NavLink
         to={to}
         className={cn(
-          'flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all duration-200 relative',
+          'flex flex-col items-center justify-center py-3 px-2 rounded-lg transition-all duration-200 relative',
           'min-w-0 flex-1',
           'hover:bg-muted/50 active:scale-95',
-          isActive && 'text-roomly-primary'
+          isActive && 'bg-muted/30'
         )}
       >
         <div className="relative">
           <Icon className={cn(
-            'h-4 w-4 transition-colors',
-            isActive && 'text-roomly-primary'
+            'h-6 w-6 transition-colors',
+            isActive ? 'text-roomly-primary' : color
           )} />
           {badge > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 h-3 w-3 bg-roomly-accent rounded-full text-xs text-white flex items-center justify-center text-[10px]">
+            <span className="absolute -top-2 -right-2 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center text-[10px] font-medium">
               {badge > 9 ? '9+' : badge}
             </span>
           )}
         </div>
-        <span className={cn(
-          'text-[10px] mt-1 font-medium truncate transition-colors leading-tight',
-          isActive ? 'text-roomly-primary' : 'text-muted-foreground'
-        )}>
-          {label}
-        </span>
         {isActive && (
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-roomly-primary rounded-full" />
+          <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-roomly-primary rounded-full" />
         )}
       </NavLink>
     );
@@ -90,7 +81,8 @@ const Navigation: React.FC = () => {
     label: string;
     badge?: number;
     collapsed?: boolean;
-  }> = ({ to, icon: Icon, label, badge = 0, collapsed = false }) => {
+    color: string;
+  }> = ({ to, icon: Icon, label, badge = 0, collapsed = false, color }) => {
     const isActive = location.pathname === to || 
       (to === '/' && location.pathname === '/') ||
       (to !== '/' && location.pathname.startsWith(to));
@@ -102,22 +94,28 @@ const Navigation: React.FC = () => {
           'flex items-center rounded-lg transition-all duration-200 relative group',
           'hover:bg-muted/50 active:scale-[0.98]',
           collapsed ? 'justify-center p-3' : 'space-x-3 py-3 px-4',
-          isActive && 'bg-roomly-primary/10 text-roomly-primary'
+          isActive && 'bg-roomly-primary/10'
         )}
       >
         <div className="relative flex-shrink-0">
-          <Icon className="h-5 w-5" />
+          <Icon className={cn(
+            'h-5 w-5 transition-colors',
+            isActive ? 'text-roomly-primary' : color
+          )} />
           {badge > 0 && !collapsed && (
-            <span className="absolute -top-2 -right-2 h-4 w-4 bg-roomly-accent rounded-full text-xs text-white flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center font-medium">
               {badge > 9 ? '9+' : badge}
             </span>
           )}
         </div>
         {!collapsed && (
-          <span className="font-medium truncate">{label}</span>
+          <span className={cn(
+            'font-medium truncate transition-colors',
+            isActive ? 'text-roomly-primary' : 'text-foreground'
+          )}>{label}</span>
         )}
         {badge > 0 && collapsed && (
-          <span className="absolute -top-1 -right-1 h-3 w-3 bg-roomly-accent rounded-full"></span>
+          <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
         )}
         
         {/* Tooltip for collapsed state */}
@@ -125,7 +123,7 @@ const Navigation: React.FC = () => {
           <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
             {label}
             {badge > 0 && (
-              <span className="ml-2 px-1.5 py-0.5 bg-roomly-accent text-white text-xs rounded-full">
+              <span className="ml-2 px-1.5 py-0.5 bg-red-500 text-white text-xs rounded-full">
                 {badge > 9 ? '9+' : badge}
               </span>
             )}
@@ -140,7 +138,7 @@ const Navigation: React.FC = () => {
       <>
         {/* Mobile Bottom Navigation - Fixed z-index to be below header */}
         <nav className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-t">
-          <div className="flex items-center justify-around px-1 py-1 safe-area-pb">
+          <div className="flex items-center justify-around px-1 py-2 safe-area-pb">
             {mainNavigationItems.map((item) => (
               <TabItem key={item.to} {...item} />
             ))}
@@ -179,12 +177,6 @@ const Navigation: React.FC = () => {
               {mainNavigationItems.map((item) => (
                 <SidebarItem key={item.to} {...item} collapsed={false} />
               ))}
-              
-              <div className="my-4 border-t" />
-              
-              {drawerItems.map((item) => (
-                <SidebarItem key={item.to} {...item} collapsed={false} />
-              ))}
             </nav>
           </div>
         </aside>
@@ -201,12 +193,6 @@ const Navigation: React.FC = () => {
         {/* Navigation Items */}
         <nav className="flex-1 p-2 space-y-1 overflow-y-auto mt-2">
           {mainNavigationItems.map((item) => (
-            <SidebarItem key={item.to} {...item} collapsed={isCollapsed} />
-          ))}
-          
-          <div className="my-4 border-t" />
-          
-          {drawerItems.map((item) => (
             <SidebarItem key={item.to} {...item} collapsed={isCollapsed} />
           ))}
         </nav>
