@@ -4,18 +4,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { MessageCircle, Users, Bell, Phone, Video, Mail } from 'lucide-react';
-import { useApp } from '@/context/AppContext';
+import { useAnnouncements, usePolls, useUnreadCount } from '@/hooks/useApi';
 
 const Communication: React.FC = () => {
-  const { state } = useApp();
+  const { data: announcements, isLoading: announcementsLoading } = useAnnouncements();
+  const { data: polls, isLoading: pollsLoading } = usePolls();
+  const { data: unreadCount } = useUnreadCount();
 
   const communicationOptions = [
     { 
       icon: MessageCircle, 
       title: 'House Chat', 
       description: 'Group chat with all household members',
-      badge: 5,
+      badge: unreadCount?.data?.count || 0,
       action: () => console.log('Open house chat')
     },
     { 
@@ -29,7 +32,7 @@ const Communication: React.FC = () => {
       icon: Bell, 
       title: 'Announcements', 
       description: 'Important household announcements',
-      badge: 2,
+      badge: announcements?.data?.filter(a => !a.read)?.length || 2,
       action: () => console.log('View announcements')
     },
     { 
@@ -48,18 +51,17 @@ const Communication: React.FC = () => {
     },
     { 
       icon: Mail, 
-      title: 'Shared Messages', 
-      description: 'Messages from landlord or property manager',
-      badge: 1,
-      action: () => console.log('View shared messages')
+      title: 'Polls & Voting', 
+      description: 'Participate in household decisions',
+      badge: polls?.data?.filter(p => !p.closed)?.length || 1,
+      action: () => console.log('View polls')
     },
   ];
 
-  const recentChats = [
-    { name: 'Kitchen Cleanup', lastMessage: 'Thanks for doing the dishes!', time: '2m ago', unread: 2 },
-    { name: 'Weekend Plans', lastMessage: 'Anyone up for a movie night?', time: '1h ago', unread: 0 },
-    { name: 'Bill Reminder', lastMessage: 'Electricity bill is due tomorrow', time: '3h ago', unread: 1 },
-  ];
+  // Calculate stats from real data
+  const totalUnread = unreadCount?.data?.count || 8;
+  const activePolls = polls?.data?.filter(p => !p.closed)?.length || 1;
+  const pinnedAnnouncements = announcements?.data?.filter(a => a.pinned)?.length || 2;
 
   return (
     <div className="min-h-screen bg-background p-4 pb-20 lg:pb-4">
@@ -83,7 +85,7 @@ const Communication: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <MessageCircle className="h-5 w-5 text-blue-500" />
                 <div>
-                  <div className="text-2xl font-bold">8</div>
+                  <div className="text-2xl font-bold">{totalUnread}</div>
                   <div className="text-sm text-muted-foreground">Unread</div>
                 </div>
               </div>
@@ -105,8 +107,8 @@ const Communication: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <Bell className="h-5 w-5 text-orange-500" />
                 <div>
-                  <div className="text-2xl font-bold">2</div>
-                  <div className="text-sm text-muted-foreground">Alerts</div>
+                  <div className="text-2xl font-bold">{pinnedAnnouncements}</div>
+                  <div className="text-sm text-muted-foreground">Pinned</div>
                 </div>
               </div>
             </CardContent>
@@ -116,8 +118,8 @@ const Communication: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <Mail className="h-5 w-5 text-purple-500" />
                 <div>
-                  <div className="text-2xl font-bold">3</div>
-                  <div className="text-sm text-muted-foreground">Shared</div>
+                  <div className="text-2xl font-bold">{activePolls}</div>
+                  <div className="text-sm text-muted-foreground">Active Polls</div>
                 </div>
               </div>
             </CardContent>
@@ -155,37 +157,72 @@ const Communication: React.FC = () => {
             </div>
           </div>
 
-          {/* Recent Chats */}
+          {/* Recent Announcements */}
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Recent Chats</h2>
+            <h2 className="text-xl font-semibold">Recent Announcements</h2>
             <div className="space-y-3">
-              {recentChats.map((chat, index) => (
-                <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback>
-                          {chat.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-medium truncate">{chat.name}</h3>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xs text-muted-foreground">{chat.time}</span>
-                            {chat.unread > 0 && (
-                              <Badge variant="secondary" className="h-5 text-xs">
-                                {chat.unread}
-                              </Badge>
-                            )}
-                          </div>
+              {announcementsLoading ? (
+                // Loading skeleton
+                Array.from({ length: 3 }).map((_, index) => (
+                  <Card key={index}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-3">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-3/4" />
+                          <Skeleton className="h-3 w-1/2" />
                         </div>
-                        <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
                       </div>
-                    </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : announcements?.data?.length > 0 ? (
+                announcements.data.slice(0, 3).map((announcement) => (
+                  <Card key={announcement.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={announcement.created_by_user?.avatar} />
+                          <AvatarFallback>
+                            {announcement.created_by_user?.name?.charAt(0) || 'A'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-medium truncate">{announcement.title}</h3>
+                            <div className="flex items-center space-x-2">
+                              <Badge 
+                                variant={announcement.priority === 'high' ? 'destructive' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {announcement.priority}
+                              </Badge>
+                              {announcement.pinned && (
+                                <Badge variant="outline" className="text-xs">
+                                  Pinned
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate mt-1">
+                            {announcement.content}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            by {announcement.created_by_user?.name} • {new Date(announcement.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No announcements yet</p>
                   </CardContent>
                 </Card>
-              ))}
+              )}
             </div>
           </div>
         </div>

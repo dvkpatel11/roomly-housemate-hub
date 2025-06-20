@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { AuthState, AuthUser, LoginCredentials, SignupCredentials, ResetPasswordCredentials, AuthError } from '@/types/auth';
 
@@ -57,34 +56,62 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Mock authentication functions - replace with actual API calls
   const login = async (credentials: LoginCredentials) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Check if we're in development mode
+      const isDevelopment = import.meta.env.DEV;
       
-      // Mock validation
-      if (credentials.email === 'test@example.com' && credentials.password === 'password') {
-        const mockUser: AuthUser = {
-          id: '1',
-          email: credentials.email,
-          name: 'Test User',
-          isEmailVerified: true,
-          onboardingCompleted: true,
-          householdId: '1',
-          createdAt: new Date(),
-        };
+      if (isDevelopment) {
+        // Mock validation for development
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        dispatch({ type: 'SET_USER', payload: mockUser });
-        localStorage.setItem('auth_user', JSON.stringify(mockUser));
-        return { success: true };
+        if (credentials.email === 'test@example.com' && credentials.password === 'password') {
+          const mockUser: AuthUser = {
+            id: '1',
+            email: credentials.email,
+            name: 'Test User',
+            isEmailVerified: true,
+            onboardingCompleted: true,
+            householdId: '1',
+            createdAt: new Date(),
+          };
+          
+          dispatch({ type: 'SET_USER', payload: mockUser });
+          localStorage.setItem('auth_user', JSON.stringify(mockUser));
+          localStorage.setItem('auth_token', 'mock_token_123');
+          return { success: true };
+        }
+        
+        return { success: false, error: { message: 'Invalid email or password' } };
+      } else {
+        // Production API call
+        const { apiService } = await import('@/services/api');
+        const response = await apiService.login(credentials.email, credentials.password);
+        
+        if (response.success && response.data.user) {
+          const user: AuthUser = {
+            id: response.data.user.id,
+            email: response.data.user.email,
+            name: response.data.user.name,
+            avatar: response.data.user.avatar,
+            isEmailVerified: true, // Assuming verified if they can login
+            onboardingCompleted: true, // Assuming completed if they can login
+            householdId: response.data.user.household_id,
+            createdAt: new Date(response.data.user.created_at),
+          };
+          
+          dispatch({ type: 'SET_USER', payload: user });
+          localStorage.setItem('auth_user', JSON.stringify(user));
+          return { success: true };
+        }
+        
+        return { success: false, error: { message: 'Invalid email or password' } };
       }
-      
-      return { success: false, error: { message: 'Invalid email or password' } };
-    } catch (error) {
-      return { success: false, error: { message: 'An error occurred during login' } };
+    } catch (error: any) {
+      dispatch({ type: 'SET_LOADING', payload: false });
+      return { success: false, error: { message: error.message || 'An error occurred during login' } };
     }
   };
 
@@ -92,7 +119,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     dispatch({ type: 'SET_LOADING', payload: true });
     
     try {
-      // Simulate API call
+      // Simulate API call for now - replace with actual API integration
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Mock validation
@@ -119,9 +146,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const logout = () => {
-    dispatch({ type: 'LOGOUT' });
-    localStorage.removeItem('auth_user');
+  const logout = async () => {
+    try {
+      // Try to call API logout if not in development
+      if (!import.meta.env.DEV) {
+        const { apiService } = await import('@/services/api');
+        await apiService.logout();
+      }
+    } catch (error) {
+      console.error('Logout API call failed:', error);
+    } finally {
+      dispatch({ type: 'LOGOUT' });
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_token');
+    }
   };
 
   const resetPassword = async (credentials: ResetPasswordCredentials) => {
@@ -178,6 +216,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Failed to parse stored user:', error);
         localStorage.removeItem('auth_user');
+        localStorage.removeItem('auth_token');
         dispatch({ type: 'SET_LOADING', payload: false });
       }
     } else {
