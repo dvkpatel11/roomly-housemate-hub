@@ -69,9 +69,9 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
                 Your Home, Organized
               </span>
             )}
-            {showProtectedContent && user?.household && (
+            {showProtectedContent && user?.householdId && (
               <span className="text-xs text-muted-foreground leading-none hidden sm:block">
-                {user.household.name}
+                Household
               </span>
             )}
           </div>
