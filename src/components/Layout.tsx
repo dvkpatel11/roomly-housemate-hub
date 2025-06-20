@@ -4,8 +4,11 @@ import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Navigation from './Navigation';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Layout: React.FC = () => {
+  const isMobile = useIsMobile();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -13,8 +16,8 @@ const Layout: React.FC = () => {
       
       <main className={cn(
         'min-h-[calc(100vh-3.5rem)]',
-        'lg:ml-64', // Desktop sidebar offset
-        'pb-20 lg:pb-0' // Mobile bottom nav offset
+        isMobile ? 'pb-20' : 'ml-16 lg:ml-64', // Responsive margin for desktop sidebar
+        'transition-all duration-300'
       )}>
         <Outlet />
       </main>

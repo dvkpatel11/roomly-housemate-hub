@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bell, Moon, Sun, User, Menu, ChevronDown } from 'lucide-react';
+import { Bell, Moon, Sun, User, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -18,7 +18,7 @@ import { useNavigation } from '@/context/NavigationContext';
 const Header: React.FC = () => {
   const { theme, setTheme, isDark } = useTheme();
   const { state } = useApp();
-  const { toggleDrawer, notifications } = useNavigation();
+  const { notifications } = useNavigation();
 
   const toggleTheme = () => {
     setTheme(isDark ? 'light' : 'dark');
@@ -27,16 +27,6 @@ const Header: React.FC = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center px-4">
-        {/* Mobile Menu Toggle */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="lg:hidden h-9 w-9 px-0 mr-2"
-          onClick={toggleDrawer}
-        >
-          <Menu className="h-4 w-4" />
-        </Button>
-
         {/* Logo and House Name */}
         <div className="flex items-center space-x-2 flex-1">
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-roomly-primary to-roomly-secondary flex items-center justify-center">
