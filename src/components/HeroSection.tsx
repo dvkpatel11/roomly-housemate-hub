@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckSquare, DollarSign, Calendar, Users } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const HeroSection: React.FC = () => {
   const features = [
