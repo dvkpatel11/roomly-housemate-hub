@@ -98,8 +98,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             avatar: response.data.user.avatar,
             isEmailVerified: true, // Assuming verified if they can login
             onboardingCompleted: true, // Assuming completed if they can login
-            householdId: response.data.user.household_id,
-            createdAt: new Date(response.data.user.created_at),
+            householdId: response.data.user.householdId, // Use camelCase property
+            createdAt: new Date(response.data.user.createdAt), // Use camelCase property
           };
           
           dispatch({ type: 'SET_USER', payload: user });
