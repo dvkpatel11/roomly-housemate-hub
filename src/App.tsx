@@ -9,6 +9,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { NavigationProvider } from "@/context/NavigationContext";
 import { SidebarProvider } from "@/context/SidebarContext";
 import Layout from "@/components/Layout";
+import AuthPageLayout from "@/components/auth/AuthPageLayout";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Tasks from "./pages/Tasks";
@@ -35,12 +36,24 @@ const App = () => (
               <Sonner />
               <BrowserRouter>
                 <Routes>
-                  {/* Auth routes (no layout) */}
-                  <Route path="/auth/login" element={<Login />} />
-                  <Route path="/auth/signup" element={<Signup />} />
-                  <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+                  {/* Auth routes (with auth layout) */}
+                  <Route path="/auth/login" element={
+                    <AuthPageLayout>
+                      <Login />
+                    </AuthPageLayout>
+                  } />
+                  <Route path="/auth/signup" element={
+                    <AuthPageLayout>
+                      <Signup />
+                    </AuthPageLayout>
+                  } />
+                  <Route path="/auth/forgot-password" element={
+                    <AuthPageLayout>
+                      <ForgotPassword />
+                    </AuthPageLayout>
+                  } />
                   
-                  {/* Public routes (no layout) */}
+                  {/* Public routes (with public header) */}
                   <Route path="/landing" element={<Landing />} />
                   
                   {/* Main app routes (with layout) */}

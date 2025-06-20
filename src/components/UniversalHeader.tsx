@@ -27,8 +27,9 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
   const { notifications } = useNavigation();
   const navigate = useNavigate();
 
-  // Determine if we should show protected content
-  const isProtected = variant === 'protected' || isAuthenticated;
+  // For protected variant, always show protected content if authenticated
+  // For public variant, always show public content
+  const showProtectedContent = variant === 'protected' && isAuthenticated;
 
   const toggleTheme = () => {
     setTheme(isDark ? 'light' : 'dark');
@@ -85,7 +86,7 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
             )}
           </Button>
 
-          {isProtected ? (
+          {showProtectedContent ? (
             <>
               {/* Notifications */}
               <Button 

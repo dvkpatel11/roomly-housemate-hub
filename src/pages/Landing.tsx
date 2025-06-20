@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,6 +21,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import PublicHeader from '@/components/PublicHeader';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -105,8 +105,10 @@ const Landing: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+      <PublicHeader />
+      
       {/* Hero Section */}
-      <section className="relative px-4 py-20 text-center overflow-hidden">
+      <section className="relative px-4 py-20 text-center overflow-hidden mt-16">
         <div className="absolute inset-0 bg-gradient-to-r from-roomly-primary/5 via-transparent to-roomly-secondary/5" />
         <div className="relative max-w-6xl mx-auto">
           <Badge variant="outline" className="mb-6 px-4 py-2 text-sm font-medium">
