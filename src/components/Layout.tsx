@@ -15,11 +15,25 @@ const Layout: React.FC = () => {
 
   console.log('Layout render:', { isAuthenticated, isLoading, isMobile });
 
+  // Don't render navigation while loading to prevent flickering
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <UniversalHeader variant="public" />
+        <main className="min-h-[calc(100vh-4rem)]">
+          <div className="w-full">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <UniversalHeader variant={isAuthenticated ? 'protected' : 'public'} />
       
-      {/* Always render Navigation when authenticated, regardless of loading state */}
+      {/* Only render Navigation when authenticated and not loading */}
       {isAuthenticated && <Navigation />}
       
       <main className={cn(

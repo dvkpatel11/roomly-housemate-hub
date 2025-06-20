@@ -81,9 +81,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           dispatch({ type: 'SET_USER', payload: mockUser });
           localStorage.setItem('auth_user', JSON.stringify(mockUser));
           localStorage.setItem('auth_token', 'mock_token_123');
+          console.log('Login successful, user set:', mockUser);
           return { success: true };
         }
         
+        dispatch({ type: 'SET_LOADING', payload: false });
         return { success: false, error: { message: 'Invalid email or password' } };
       } else {
         // Production API call
@@ -208,21 +210,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Load user from localStorage on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem('auth_user');
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        dispatch({ type: 'SET_USER', payload: user });
-      } catch (error) {
-        console.error('Failed to parse stored user:', error);
-        localStorage.removeItem('auth_user');
-        localStorage.removeItem('auth_token');
+    const initializeAuth = () => {
+      console.log('Initializing auth state...');
+      const storedUser = localStorage.getItem('auth_user');
+      const storedToken = localStorage.getItem('auth_token');
+      
+      if (storedUser && storedToken) {
+        try {
+          const user = JSON.parse(storedUser);
+          console.log('Found stored user, setting authenticated state:', user);
+          dispatch({ type: 'SET_USER', payload: user });
+        } catch (error) {
+          console.error('Failed to parse stored user:', error);
+          localStorage.removeItem('auth_user');
+          localStorage.removeItem('auth_token');
+          dispatch({ type: 'SET_LOADING', payload: false });
+        }
+      } else {
+        console.log('No stored user found, setting loading to false');
         dispatch({ type: 'SET_LOADING', payload: false });
       }
-    } else {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
+    };
+
+    initializeAuth();
   }, []);
+
+  // Debug logging for state changes
+  useEffect(() => {
+    console.log('Auth state changed:', { 
+      isAuthenticated: state.isAuthenticated, 
+      isLoading: state.isLoading, 
+      user: state.user 
+    });
+  }, [state.isAuthenticated, state.isLoading, state.user]);
 
   const contextValue: AuthContextType = {
     ...state,

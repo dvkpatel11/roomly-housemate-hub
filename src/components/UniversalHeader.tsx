@@ -54,12 +54,18 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
     }
   };
 
-  // For protected variant, only show protected content if user is authenticated
-  const showProtectedContent = variant === 'protected' && isAuthenticated;
-  // For public variant, always show public content
-  const showPublicContent = variant === 'public';
+  // Determine what content to show based on variant and authentication
+  const showProtectedContent = variant === 'protected' && isAuthenticated && !isLoading;
+  const showPublicContent = variant === 'public' || !isAuthenticated || isLoading;
 
-  console.log('UniversalHeader render:', { variant, isAuthenticated, user, showProtectedContent });
+  console.log('UniversalHeader render:', { 
+    variant, 
+    isAuthenticated, 
+    isLoading, 
+    user, 
+    showProtectedContent, 
+    showPublicContent 
+  });
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
