@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Calendar, CheckSquare, DollarSign, MessageCircle, Settings, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, Calendar, CheckSquare, DollarSign, MessageCircle, House, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigation } from '@/context/NavigationContext';
 import { useSidebar } from '@/context/SidebarContext';
@@ -9,12 +8,12 @@ import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const mainNavigationItems = [
-  { to: '/', icon: Home, label: 'Dashboard', badge: 0, color: 'text-blue-500' },
-  { to: '/calendar', icon: Calendar, label: 'Calendar', badge: 2, color: 'text-green-500' },
-  { to: '/tasks', icon: CheckSquare, label: 'Tasks', badge: 5, color: 'text-purple-500' },
-  { to: '/expenses', icon: DollarSign, label: 'Expenses', badge: 0, color: 'text-yellow-500' },
-  { to: '/communication', icon: MessageCircle, label: 'Communication', badge: 3, color: 'text-pink-500' },
-  { to: '/profile', icon: Settings, label: 'More', badge: 0, color: 'text-gray-500' },
+  { to: '/dashboard', icon: Home, label: 'Dashboard', badge: 0, color: 'text-blue-500' },
+  { to: '/dashboard/calendar', icon: Calendar, label: 'Calendar', badge: 2, color: 'text-green-500' },
+  { to: '/dashboard/tasks', icon: CheckSquare, label: 'Tasks', badge: 5, color: 'text-purple-500' },
+  { to: '/dashboard/expenses', icon: DollarSign, label: 'Expenses', badge: 0, color: 'text-yellow-500' },
+  { to: '/dashboard/communication', icon: MessageCircle, label: 'Communication', badge: 3, color: 'text-pink-500' },
+  { to: '/dashboard/profile', icon: House, label: 'House', badge: 0, color: 'text-orange-500' },
 ];
 
 const Navigation: React.FC = () => {
@@ -44,8 +43,8 @@ const Navigation: React.FC = () => {
     color: string;
   }> = ({ to, icon: Icon, label, badge = 0, color }) => {
     const isActive = location.pathname === to || 
-      (to === '/' && location.pathname === '/') ||
-      (to !== '/' && location.pathname.startsWith(to));
+      (to === '/dashboard' && location.pathname === '/dashboard') ||
+      (to !== '/dashboard' && location.pathname.startsWith(to));
     
     return (
       <NavLink
@@ -69,7 +68,7 @@ const Navigation: React.FC = () => {
           )}
         </div>
         {isActive && (
-          <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-roomly-primary rounded-full" />
+          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-roomly-primary rounded-full" />
         )}
       </NavLink>
     );
@@ -84,8 +83,8 @@ const Navigation: React.FC = () => {
     color: string;
   }> = ({ to, icon: Icon, label, badge = 0, collapsed = false, color }) => {
     const isActive = location.pathname === to || 
-      (to === '/' && location.pathname === '/') ||
-      (to !== '/' && location.pathname.startsWith(to));
+      (to === '/dashboard' && location.pathname === '/dashboard') ||
+      (to !== '/dashboard' && location.pathname.startsWith(to));
     
     return (
       <NavLink

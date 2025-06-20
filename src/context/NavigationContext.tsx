@@ -11,7 +11,7 @@ interface NavigationContextType {
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
 
 export const NavigationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [activeTab, setActiveTab] = useState('/');
+  const [activeTab, setActiveTab] = useState('/dashboard');
   const [notifications, setNotifications] = useState(3);
 
   const contextValue: NavigationContextType = {

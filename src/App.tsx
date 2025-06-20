@@ -53,10 +53,10 @@ const App = () => (
                   } />
                   
                   {/* Public routes (with public header) */}
-                  <Route path="/landing" element={<Landing />} />
+                  <Route path="/" element={<Landing />} />
                   
                   {/* Main app routes (with layout) */}
-                  <Route path="/" element={<Layout />}>
+                  <Route path="/dashboard" element={<Layout />}>
                     <Route index element={<Index />} />
                     <Route path="calendar" element={<Events />} />
                     <Route path="expenses" element={<Expenses />} />

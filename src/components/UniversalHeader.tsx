@@ -86,7 +86,7 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
           )}
 
           {/* Logo Section */}
-          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+          <Link to={showProtectedContent ? "/dashboard" : "/"} className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <div className="relative">
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-roomly-primary to-roomly-secondary flex items-center justify-center shadow-lg">
                 <Home className="h-5 w-5 text-white" />
@@ -180,7 +180,7 @@ const UniversalHeader: React.FC<UniversalHeaderProps> = ({ variant = 'public' })
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
+                  <DropdownMenuItem onClick={() => navigate('/dashboard/profile')} className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     Profile
                   </DropdownMenuItem>
