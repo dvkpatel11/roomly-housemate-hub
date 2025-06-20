@@ -1,9 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Calendar, DollarSign, CheckSquare, User, Settings, Menu, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, Calendar, DollarSign, CheckSquare, User, Settings, Menu, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigation } from '@/context/NavigationContext';
+import { useSidebar } from '@/context/SidebarContext';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -22,12 +22,19 @@ const drawerItems = [
 const Navigation: React.FC = () => {
   const location = useLocation();
   const { setActiveTab } = useNavigation();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, toggleSidebar, isMobileOpen, setIsMobileOpen } = useSidebar();
   const isMobile = useIsMobile();
 
   useEffect(() => {
     setActiveTab(location.pathname);
   }, [location.pathname, setActiveTab]);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    if (isMobile) {
+      setIsMobileOpen(false);
+    }
+  }, [location.pathname, isMobile, setIsMobileOpen]);
 
   const TabItem: React.FC<{ 
     to: string; 
@@ -89,12 +96,12 @@ const Navigation: React.FC = () => {
         to={to}
         className={cn(
           'flex items-center rounded-lg transition-all duration-200 relative group',
-          'hover:bg-muted/50',
+          'hover:bg-muted/50 active:scale-[0.98]',
           collapsed ? 'justify-center p-3' : 'space-x-3 py-3 px-4',
           isActive && 'bg-roomly-primary/10 text-roomly-primary'
         )}
       >
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <Icon className="h-5 w-5" />
           {badge > 0 && !collapsed && (
             <span className="absolute -top-2 -right-2 h-4 w-4 bg-roomly-accent rounded-full text-xs text-white flex items-center justify-center">
@@ -102,7 +109,9 @@ const Navigation: React.FC = () => {
             </span>
           )}
         </div>
-        {!collapsed && <span className="font-medium">{label}</span>}
+        {!collapsed && (
+          <span className="font-medium truncate">{label}</span>
+        )}
         {badge > 0 && collapsed && (
           <span className="absolute -top-1 -right-1 h-3 w-3 bg-roomly-accent rounded-full"></span>
         )}
@@ -111,6 +120,11 @@ const Navigation: React.FC = () => {
         {collapsed && (
           <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
             {label}
+            {badge > 0 && (
+              <span className="ml-2 px-1.5 py-0.5 bg-roomly-accent text-white text-xs rounded-full">
+                {badge > 9 ? '9+' : badge}
+              </span>
+            )}
           </div>
         )}
       </NavLink>
@@ -119,19 +133,64 @@ const Navigation: React.FC = () => {
 
   if (isMobile) {
     return (
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t">
-        <div className="flex items-center justify-around px-2 py-1 safe-area-pb">
-          {mainNavigationItems.map((item) => (
-            <TabItem key={item.to} {...item} />
-          ))}
-        </div>
-      </nav>
+      <>
+        {/* Mobile Bottom Navigation */}
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t">
+          <div className="flex items-center justify-around px-2 py-1 safe-area-pb">
+            {mainNavigationItems.map((item) => (
+              <TabItem key={item.to} {...item} />
+            ))}
+          </div>
+        </nav>
+
+        {/* Mobile Overlay */}
+        {isMobileOpen && (
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setIsMobileOpen(false)}
+          />
+        )}
+
+        {/* Mobile Sidebar */}
+        <aside className={cn(
+          'fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-64 bg-background border-r z-50 transform transition-transform duration-300 ease-in-out lg:hidden',
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}>
+          <div className="flex flex-col h-full">
+            {/* Mobile Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="font-semibold">Menu</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileOpen(false)}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Mobile Navigation Items */}
+            <nav className="flex-1 p-2 space-y-1">
+              {mainNavigationItems.map((item) => (
+                <SidebarItem key={item.to} {...item} collapsed={false} />
+              ))}
+              
+              <div className="my-4 border-t" />
+              
+              {drawerItems.map((item) => (
+                <SidebarItem key={item.to} {...item} collapsed={false} />
+              ))}
+            </nav>
+          </div>
+        </aside>
+      </>
     );
   }
 
   return (
     <aside className={cn(
-      'fixed left-0 top-14 h-[calc(100vh-3.5rem)] flex flex-col border-r bg-background transition-all duration-300 z-40',
+      'fixed left-0 top-14 h-[calc(100vh-3.5rem)] flex flex-col border-r bg-background z-40 transition-all duration-300 ease-in-out',
       isCollapsed ? 'w-16' : 'w-64'
     )}>
       {/* Collapse Toggle */}
@@ -139,8 +198,8 @@ const Navigation: React.FC = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="h-8 w-8 p-0"
+          onClick={toggleSidebar}
+          className="h-8 w-8 p-0 hover:bg-muted/50"
         >
           {isCollapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -151,7 +210,7 @@ const Navigation: React.FC = () => {
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 p-2 space-y-1">
+      <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {mainNavigationItems.map((item) => (
           <SidebarItem key={item.to} {...item} collapsed={isCollapsed} />
         ))}
